@@ -74,6 +74,7 @@ class WebServerHandler(BaseHTTPRequestHandler):
 
             self.wfile.write(message)
             return
+        #we can't use self.path because we are passing a URL param
         elif path == "/restaurants/edit":
 
             self.send_response(200)
@@ -107,24 +108,35 @@ class WebServerHandler(BaseHTTPRequestHandler):
 
             self.wfile.write(message)
             return
-        elif self.path == "/restaurants/delete":
+        elif path == "/restaurants/delete":
+
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
             #the following line is to avoid an undefined error
             id = ''
             #if there is one parameter, it is the id of the post to edit
+
             #right now, this is the only url parameter that we accept
-            if len(URLparams) == 1:
-                id = URLparams[0]
-            #get the restaurant
-            restaurant = session.query(Restaurant).filter_by(id = id).one()
+            if URLparams:
+                if len(URLparams) == 1:
+                    id = URLparams[0]
+                else:
+                    self.send_error(403, 'Not Accessible: %s' % self.path)
             message = ""
             message += "<html><title>Delete</title><body>"
             message += '''<form method='Post' enctype='multipart/form-data' action='/restaurants/delete'>
-            <h2>What would you like the name of the new Restaurant to be now?</h2>
+            <h2>Are you sure that you want to delete this restaurant?</h2>
             <input name='id' type='hidden' value='%s'>
-            <input name='name' type='text' >
+            <input name='response' type='radio' value='yes'>Yes
+            <input name='response' type='radio' value='no'>No
             <input type='submit' value='Submit'>
             </form>
             ''' % id
+
+
+            self.wfile.write(message)
+            return
         else:
             self.send_error(404, 'File Not Found: %s' % self.path)
 
@@ -189,6 +201,38 @@ class WebServerHandler(BaseHTTPRequestHandler):
                     restaurant.name = name[0]
                     session.add(restaurant)
                     session.commit()
+                self.wfile.write(output)
+                print output
+            except:
+                pass
+        elif self.path == "/restaurants/delete":
+            try:
+
+                #status code 301 indicates successful get request
+                self.send_response(301)
+                self.send_header('Content-type', 'text/html')
+                self.end_headers()
+
+                #ctype is main values and pdict are a dictionary of parameters that we send
+                ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
+                #if the main value is form-data
+                if ctype == 'multipart/form-data':
+                    #use the fields variable to parse out the dictionary of parameters that we've sent
+                    #messagecontent will be an array
+                    fields = cgi.parse_multipart(self.rfile, pdict)
+                    messagecontent = fields.get('id')
+                    response = fields.get('response')
+                    id = fields.get('id')
+                output = ""
+                output += "<html><head><title>Delete successful</title></head><body>"
+                if response[0] =='yes':
+                    restaurant = session.query(Restaurant).filter_by(id = id[0]).one()
+                    session.delete(restaurant)
+                    session.commit()
+                    output += " <h2>This restaurant has been deleted</h2>"
+                elif response[0] == 'no':
+                    output += " <h2>This restaurant has not been deleted</h2>"
+                output += "Go back to <a href='/restaurants'>restaurants</a> to view it"
                 self.wfile.write(output)
                 print output
             except:
