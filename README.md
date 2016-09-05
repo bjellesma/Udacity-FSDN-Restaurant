@@ -18,9 +18,7 @@
 * `cd vagrant`
 * `vagrant up`
 * `vagrant ssh`
-* once in the vm: `cd /vagrant/resturant`
-* Read the menu with `python read_menu.py`
-* Add to menu with `python add_menu_item.py`
+
 
 
 <a name="Author"><h1>Author</h1></a>
