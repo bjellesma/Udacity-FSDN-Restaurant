@@ -30,6 +30,7 @@ class WebServerHandler(BaseHTTPRequestHandler):
         URLparams = {}
         if len(p) > 1:
             URLparams = p[1].split("&")
+        #the following path will just list all of the restaurants
         if path == "/restaurants":
             #status code 200 indicates successful get request
             self.send_response(200)
@@ -79,28 +80,24 @@ class WebServerHandler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'text/html')
             self.end_headers()
 
-            #so python doesn't complain
+            #so python doesn't complain at undefined object
             name = ''
 
             if URLparams:
+                #if there is one parameter, it is the id of the post to edit
                 if len(URLparams) == 1:
                     id = URLparams[0]
-                elif len(URLparams) == 2:
-                    idPair = URLparams[0].split('=')
-                    id = idPair[1]
-                    namePair = URLparams[1].split('=')
-                    name = namePair[1]
+
                 else:
                     self.send_error(403, 'Not Accessible: %s' % self.path)
-            #create the restaurants to contain all of the restaurants in the db
-            restaurant = session.query(Restaurant).filter_by(id = id).one()
-            if name:
-                restaurant.name = name
-                session.add(restaurant)
-                session.commit()
+
+
+            #the following form will send two post params
+            #one param for id
+            #one param for the name
             message = ""
             message += "<html><title>Update</title><body>"
-            message += '''<form method='get' enctype='multipart/form-data' action='/restaurants/edit'>
+            message += '''<form method='Post' enctype='multipart/form-data' action='/restaurants/edit'>
             <h2>What would you like the name of the new Restaurant to be now?</h2>
             <input name='id' type='hidden' value='%s'>
             <input name='name' type='text' >
@@ -110,40 +107,92 @@ class WebServerHandler(BaseHTTPRequestHandler):
 
             self.wfile.write(message)
             return
+        elif self.path == "/restaurants/delete":
+            #the following line is to avoid an undefined error
+            id = ''
+            #if there is one parameter, it is the id of the post to edit
+            #right now, this is the only url parameter that we accept
+            if len(URLparams) == 1:
+                id = URLparams[0]
+            #get the restaurant
+            restaurant = session.query(Restaurant).filter_by(id = id).one()
+            message = ""
+            message += "<html><title>Delete</title><body>"
+            message += '''<form method='Post' enctype='multipart/form-data' action='/restaurants/delete'>
+            <h2>What would you like the name of the new Restaurant to be now?</h2>
+            <input name='id' type='hidden' value='%s'>
+            <input name='name' type='text' >
+            <input type='submit' value='Submit'>
+            </form>
+            ''' % id
         else:
             self.send_error(404, 'File Not Found: %s' % self.path)
 
     def do_POST(self):
-        try:
+        if self.path == "/restaurants/new":
+            try:
 
-            #status code 301 indicates successful get request
-            self.send_response(301)
-            self.send_header('Content-type', 'text/html')
-            self.end_headers()
+                #status code 301 indicates successful get request
+                self.send_response(301)
+                self.send_header('Content-type', 'text/html')
+                self.end_headers()
 
-            #ctype is main values and pdict are a dictionary of parameters that we send
-            ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
-            #if the main value is form-data
-            if ctype == 'multipart/form-data':
-                #use the fields variable to parse out the dictionary of parameters that we've sent
-                #messagecontent will be an array
-                fields = cgi.parse_multipart(self.rfile, pdict)
-                messagecontent = fields.get('name')
-            output = ""
-            output += "<html><body>"
-            output += " <h2>Here is the name of your restaurant: </h2>"
-            output += "<h1> %s </h1>" % messagecontent[0]
-            output += "Go back to <a href='/restaurants'>restaurants</a> to view it"
-            restaurant = Restaurant(name = messagecontent[0])
-            #addming new item to staging area
-            session.add(restaurant)
-            #commiting changes to database
-            session.commit()
-            self.wfile.write(output)
-            print output
-        except:
-            pass
+                #ctype is main values and pdict are a dictionary of parameters that we send
+                ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
+                #if the main value is form-data
+                if ctype == 'multipart/form-data':
+                    #use the fields variable to parse out the dictionary of parameters that we've sent
+                    #messagecontent will be an array
+                    fields = cgi.parse_multipart(self.rfile, pdict)
+                    messagecontent = fields.get('name')
+                output = ""
+                output += "<html><body>"
+                output += " <h2>Here is the name of your restaurant: </h2>"
+                output += "<h1> %s </h1>" % messagecontent[0]
+                output += "Go back to <a href='/restaurants'>restaurants</a> to view it"
+                restaurant = Restaurant(name = messagecontent[0])
+                #addming new item to staging area
+                #TODO take out url input chars (ex: bill burger is sent in the url as bill+burger)
+                session.add(restaurant)
+                #commiting changes to database
+                session.commit()
+                self.wfile.write(output)
+                print output
+            except:
+                pass
+        elif self.path == "/restaurants/edit":
+            try:
 
+                #status code 301 indicates successful get request
+                self.send_response(301)
+                self.send_header('Content-type', 'text/html')
+                self.end_headers()
+
+                #ctype is main values and pdict are a dictionary of parameters that we send
+                ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
+                #if the main value is form-data
+                if ctype == 'multipart/form-data':
+                    #use the fields variable to parse out the dictionary of parameters that we've sent
+                    #messagecontent will be an array
+                    fields = cgi.parse_multipart(self.rfile, pdict)
+                    messagecontent = fields.get('id')
+                    name = fields.get('name')
+                    id = fields.get('id')
+                output = ""
+                output += "<html><head><title>Update successful</title></head><body>"
+                output += " <h2>Here is the new name of your restaurant: </h2>"
+                output += "<h1> %s </h1>" % name[0]
+                output += "Go back to <a href='/restaurants'>restaurants</a> to view it"
+                #update the resturant
+                restaurant = session.query(Restaurant).filter_by(id = id[0]).one()
+                if name:
+                    restaurant.name = name[0]
+                    session.add(restaurant)
+                    session.commit()
+                self.wfile.write(output)
+                print output
+            except:
+                pass
 
 def main():
     try:
