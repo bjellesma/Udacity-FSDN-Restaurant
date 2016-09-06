@@ -18,7 +18,8 @@
 * `cd vagrant`
 * `vagrant up`
 * `vagrant ssh`
-
+* create a secret session key in secure_sample.py
+* once you have created the session key, remove `_sample` from secure_sample.py
 
 
 <a name="Author"><h1>Author</h1></a>

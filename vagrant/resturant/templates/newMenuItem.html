@@ -1,6 +1,18 @@
 {% extends "partials/base.html" %}
 {% block title %}New Menu Item{% endblock %}
 {% block body %}
+<!--MESSAGE FLASH -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+
+<div class="message_flash">
+{% for message in messages %}
+  <p><strong>{{message}}</strong></p>
+  {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+<!-- end message flash -->
 <form method='Post' enctype='multipart/form-data' action="{{'/restaurants/%s/newMenuItem/' % restaurant_id}}">
   <h2>New Menu Item</h2>
   Name: <input name='name' type='text' > <br>

@@ -33,6 +33,18 @@ class MenuItem(Base):
     #creating the reference for the ForeignKey to use
     restaurant = relationship(Restaurant)
 
+# We added this serialize function to be able to send JSON objects in a
+# serializable format
+    @property
+    def serialize(self):
+
+        return {
+            'name': self.name,
+            'description': self.description,
+            'id': self.id,
+            'price': self.price,
+            'course': self.course,
+        }
 #end of file wrap up
 engine = create_engine('sqlite:///restaurantmenu.db')
 #adds the class to the db
