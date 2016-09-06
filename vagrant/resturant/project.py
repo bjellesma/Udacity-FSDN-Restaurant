@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, redirect
 #create instance of flask class with the name of the app
 app = Flask(__name__)
 
@@ -54,16 +54,19 @@ def homePage():
 
 def readRestaurant(restaurant_id):
     #get restaurant
-    items = session.query(MenuItem).filter_by(restaurant_id = restaurant_id)
+    restaurant = models.RestaurantModel.getRestaurantByID(restaurant_id)
+    items = models.MenuItemModel.getAllMenuItems(restaurant_id)
     output = initPage()
-    output += '<h1>%s</h1>' % models.RestaurantModel.getRestaurantByID(restaurant_id).name
+    output += '<h1>%s</h1>' % restaurant.name
     output += "<a href='/restaurants/%s/newMenuItem/'><button type='button'>Create New Menu Item</button></a>" % restaurant_id
+    output += "<p>Click an item name to edit it</p>"
     for item in items:
         output += "<div class ='row'>"
-        output += "<div class='col-md-9'><p>%s</p></div>" % item.name
+        output += "<div class='col-md-9'><p><a href='/menuItem/%s/%s/edit'>%s</p></a></div>" % (restaurant_id, item.id, item.name)
         output += "<div class='col-md-3'><p>%s</p></div>" % item.price
         output += "</div>"
         output += "<p>%s</p>" % item.description
+        output += "<a href='/menuItem/%s/%s/delete/'><button type='button'>Delete</button></a>" % (restaurant_id, item.id)
         output += '<br>'
     output += endPage()
     return output
@@ -86,6 +89,62 @@ def newMenuItem(restaurant_id):
     ''' % (restaurant_id, restaurant_id, restaurant_id)
     if request.method =='POST':
         models.MenuItemModel.postNewMenuItem(request.form['restaurant_id'],
+                        request.form['name'],
+                        request.form['course'],
+                        request.form['description'],
+                        request.form['price']
+                        )
+    output += endPage()
+    return output
+
+@app.route('/menuItem/<int:restaurant_id>/<int:menuItem_id>/edit/', methods=['GET', 'POST'])
+
+def editMenuItem(menuItem_id, restaurant_id):
+    menuItem = models.MenuItemModel.getMenuItemByID(menuItem_id)
+    output = initPage()
+    output += '''<form method='Post' enctype='multipart/form-data' action='/menuItem/%s/%s/edit/'>
+    <h2>Edit Menu Item</h2>
+    Name: <input name='name' type='text' value='%s'> <br>
+    Course: <input name='course' type='text' value='%s'> <br>
+    Price: <input name='price' type='text' value='%s'> <br>
+    Description: <textarea rows='9' cols='9' name='description'>%s</textarea> <br>
+    <input type='submit' value='Submit'>
+    </form>
+    <a href='/restaurants/%s'><button type='button'>Cancel</button></a>
+    ''' % (restaurant_id, menuItem_id, menuItem.name, menuItem.course, menuItem.price, menuItem.description, restaurant_id)
+    if request.method =='POST':
+        models.MenuItemModel.postEditMenuItem(restaurant_id,
+                        menuItem_id,
+                        request.form['name'],
+                        request.form['course'],
+                        request.form['description'],
+                        request.form['price']
+                        )
+    output += endPage()
+    return output
+
+@app.route('/menuItem/<int:restaurant_id>/<int:menuItem_id>/delete/', methods=['GET', 'POST'])
+
+def deleteMenuItem(menuItem_id, restaurant_id):
+    menuItem = models.MenuItemModel.getMenuItemByID(menuItem_id)
+    output = initPage()
+    output += '''<form method='Post' enctype='multipart/form-data' action='/menuItem/%s/%s/delete/'>
+    <h2>Delete Menu Item</h2>
+    <h2>Are you sure that you want to delete %s?</h2>
+    <input name='response' type='radio' value='yes'>Yes
+    <input name='response' type='radio' value='no'>No
+    <input type='submit' value='Submit'>
+    </form>
+    <a href='/restaurants/%s'><button type='button'>Cancel</button></a>
+    ''' % (restaurant_id, menuItem_id, menuItem.name, restaurant_id)
+    if request.method =='POST':
+        if request.form['response'] =='yes':
+            models.MenuItemModel.deleteMenuItem(menuItem_id)
+            redirect("/restaurants/%s" % restaurant_id, code=200)
+        elif request.form['response'] == 'no':
+            redirect("/restaurants/s" % restaurant_id, code=200)
+        models.MenuItemModel.postEditMenuItem(restaurant_id,
+                        menuItem_id,
                         request.form['name'],
                         request.form['course'],
                         request.form['description'],
