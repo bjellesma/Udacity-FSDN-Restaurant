@@ -1,0 +1,13 @@
+{% extends "partials/base.html" %}
+{% block title %}New Menu Item{% endblock %}
+{% block body %}
+<form method='Post' enctype='multipart/form-data' action="{{'/restaurants/%s/newMenuItem/' % restaurant_id}}">
+  <h2>New Menu Item</h2>
+  Name: <input name='name' type='text' > <br>
+  Course: <input name='course' type='text' > <br>
+  Price: <input name='price' type='text' > <br>
+  Description: <textarea rows='4' cols='40' name='description'></textarea> <br>
+  <input type='submit' value='Submit'>
+  </form>
+  <a href="{{'/restaurants/%s' % restaurant_id }}"><button type='button'>Cancel</button></a>
+{% endblock %}

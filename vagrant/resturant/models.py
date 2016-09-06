@@ -13,6 +13,11 @@ class RestaurantModel():
     session = DBSession()
 
     @classmethod
+    def getAllRestaurants(cls):
+        restaurants = cls.session.query(Restaurant).all()
+        return restaurants
+
+    @classmethod
     def getRestaurantByID(cls, restaurant_id):
         restaurant = cls.session.query(Restaurant).filter_by(id = restaurant_id).one()
         return restaurant

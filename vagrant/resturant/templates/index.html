@@ -1,0 +1,7 @@
+{% extends "partials/base.html" %}
+{% block title %}Home{% endblock %}
+{% block body %}
+{% for restaurant in restaurants %}
+<a href="{{ '/restaurants/%s'%restaurant.id }}"><h1>{{restaurant.name}}</h1></a>
+{% endfor %}
+{% endblock %}
