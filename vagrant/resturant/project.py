@@ -145,7 +145,6 @@ def gdisconnect():
 @app.route('/fbconnect', methods=['POST'])
 def fbconnect():
     #verify state to prevent csrf
-    print login_session['state']
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -237,7 +236,7 @@ def disconnect():
             del login_session['user_id']
             del login_session['provider']
         flash("You have successfully been logged out.")
-        return redirect(url_for('showRestaurants'))
+        return redirect('/')
     else:
         flash("You were not logged in")
         return redirect('/')
