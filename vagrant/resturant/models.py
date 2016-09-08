@@ -35,8 +35,8 @@ class MenuItemModel():
         return items
 
     @classmethod
-    def postNewMenuItem(cls, restaurant_id, name, course, description, price):
-        menuItem = MenuItem(name = name, course = course, description = description, price = price, restaurant_id = restaurant_id)
+    def postNewMenuItem(cls, restaurant_id, name, course, description, price, user_id):
+        menuItem = MenuItem(name = name, course = course, description = description, price = price, restaurant_id = restaurant_id, user_id = user_id)
         cls.session.add(menuItem)
         cls.session.commit()
 
@@ -61,3 +61,27 @@ class MenuItemModel():
         menuItem = cls.getMenuItemByID(id)
         cls.session.delete(menuItem)
         cls.session.commit()
+
+class UsersModel():
+
+    @classmethod
+    def createUser(cls, login_session):
+        newUser = User(name=login_session['username'], email=login_session[
+                       'email'], picture=login_session['picture'])
+        cls.session.add(newUser)
+        cls.session.commit()
+        user = cls.session.query(User).filter_by(email=login_session['email']).one()
+        return user.id
+
+    @classmethod
+    def getUserInfo(cls, user_id):
+        user = cls.session.query(User).filter_by(id=user_id).one()
+        return user
+
+    @classmethod
+    def getUserID(cls, email):
+        try:
+            user = cls.session.query(User).filter_by(email=email).one()
+            return user.id
+        except:
+            return None

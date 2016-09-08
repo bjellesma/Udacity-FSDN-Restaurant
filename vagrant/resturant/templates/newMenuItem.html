@@ -19,6 +19,7 @@
   Course: <input name='course' type='text' > <br>
   Price: <input name='price' type='text' > <br>
   Description: <textarea rows='4' cols='40' name='description'></textarea> <br>
+  <input name="user_id" type="hidden" value="{{user_id}}">
   <input type='submit' value='Submit'>
   </form>
   <a href="{{'/restaurants/%s' % restaurant_id }}"><button type='button'>Cancel</button></a>

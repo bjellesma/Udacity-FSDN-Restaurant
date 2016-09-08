@@ -10,6 +10,18 @@ from sqlalchemy import create_engine
 
 Base = declarative_base()
 
+
+
+"""
+The Users class is designed to inherit from Base
+"""
+class Users(Base):
+    __tablename__ = 'users'
+    id = Column(Integer, primary_key = True)
+    name = Column(String(80), nullable = False)
+    email = Column(String(80), nullable = False)
+    picture = Column(String(80), nullable = False)
+
 """
 The restaurant class is designed to inherit from Base
 """
@@ -18,6 +30,8 @@ class Restaurant(Base):
     __tablename__ = 'restaurant'
     id = Column(Integer, primary_key = True)
     name = Column(String(80), nullable = False)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    users = relationship(Users)
 
 """
 The MenuItem class is designed to inherit from Base
@@ -32,6 +46,8 @@ class MenuItem(Base):
     restaurant_id = Column(Integer, ForeignKey('restaurant.id'))
     #creating the reference for the ForeignKey to use
     restaurant = relationship(Restaurant)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    users = relationship(Users)
 
 # We added this serialize function to be able to send JSON objects in a
 # serializable format
