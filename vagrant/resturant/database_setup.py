@@ -30,8 +30,8 @@ class Restaurant(Base):
     __tablename__ = 'restaurant'
     id = Column(Integer, primary_key = True)
     name = Column(String(80), nullable = False)
-    user_id = Column(Integer, ForeignKey('users.id'))
-    users = relationship(Users)
+    #user_id = Column(Integer, ForeignKey('users.id'))
+    #users = relationship(Users)
 
 """
 The MenuItem class is designed to inherit from Base
