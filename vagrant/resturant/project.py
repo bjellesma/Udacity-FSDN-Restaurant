@@ -108,17 +108,7 @@ def gconnect():
     if not user_id:
         user_id = models.UsersModel.createUser(login_session)
     login_session['user_id'] = user_id
-
-    output = ''
-    output += '<h1>Welcome, '
-    output += login_session['username']
-    output += '!</h1>'
-    output += '<img src="'
-    output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
-    flash("you are now logged in as %s" % login_session['username'])
-    print "done!"
-    return output
+    return redirect('/')
 
 #diconnect user
 #TODO this function is only used for testing. disconnecting should be done on the /disconnect page
@@ -177,6 +167,7 @@ def fbconnect():
     login_session['username'] = data["name"]
     login_session['email'] = data["email"]
     login_session['facebook_id'] = data["id"]
+    login_session['provider'] = 'facebook'
 
     # The token must be stored in the login_session in order to properly logout, let's strip out the information before the equals sign in our token
     stored_token = token.split("=")[1]
@@ -195,18 +186,7 @@ def fbconnect():
     if not user_id:
         user_id = models.UsersModel.createUser(login_session)
     login_session['user_id'] = user_id
-
-    output = ''
-    output += '<h1>Welcome, '
-    output += login_session['username']
-
-    output += '!</h1>'
-    output += '<img src="'
-    output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
-
-    flash("Now logged in as %s" % login_session['username'])
-    return output
+    return redirect('/')
 
 
 @app.route('/fbdisconnect')
@@ -225,20 +205,28 @@ def disconnect():
     if 'provider' in login_session:
         if login_session['provider'] == 'google':
             gdisconnect()
+            del login_session['access_token']
+            del login_session['state']
             del login_session['gplus_id']
-            del login_session['credentials']
+            del login_session['username']
+            del login_session['email']
+            del login_session['picture']
+            del login_session['user_id']
+            #TODO find out why we can't delete provider
+            login_session['provider'] = ''
+            #credentials are deleted by google
         if login_session['provider'] == 'facebook':
             fbdisconnect()
+            del login_session['access_token']
+            del login_session['state']
             del login_session['facebook_id']
             del login_session['username']
             del login_session['email']
             del login_session['picture']
             del login_session['user_id']
             del login_session['provider']
-        flash("You have successfully been logged out.")
         return redirect('/')
     else:
-        flash("You were not logged in")
         return redirect('/')
 
 #sqlalchemy code
@@ -281,15 +269,21 @@ def showLogin():
 
 
 def homePage():
-    #TODO test code
-    if 'username' not in login_session:
+
+    if models.UsersModel.isLoggedIn(login_session):
+        user = models.UsersModel.getUserInfo(models.UsersModel.getUserID(login_session['email']))
+    else:
+        user = None
+    '''if 'username' not in login_session:
         username = "Sign in"
         provider = ''
     else:
         username = login_session['username']
         provider = login_session['provider']
+        '''
     restaurants = models.RestaurantModel.getAllRestaurants()
-    return render_template('/index.html', restaurants = restaurants, username = username, provider = provider)
+    #TODO login session is test code
+    return render_template('/index.html', restaurants = restaurants, user = user, login_session = login_session)
 
 
 @app.route('/restaurants/<int:restaurant_id>/')

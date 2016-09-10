@@ -10,6 +10,18 @@
 </head>
   <body>
     <div class=container>
+      <nav id="wj_nav">
+        <ul>
+          <li><a href="/">Home</a></li>
+          {% if user %}
+            <li><a href="#">{{ user.name }}</a></li>
+            <li><a href="/disconnect">Logout</a></li>
+          {% else %}
+            <li><a href="/login">Login</a></li>
+
+          {% endif %}
+        </ul>
+      </nav>
       {% block body %}
       {% endblock %}
       <footer>

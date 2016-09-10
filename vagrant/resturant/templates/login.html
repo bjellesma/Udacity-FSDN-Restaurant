@@ -2,17 +2,6 @@
 {% block title %}Edit Menu Item{% endblock %}
 
 {% block body %}
-<!--MESSAGE FLASH -->
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-
-<div class="message_flash">
-{% for message in messages %}
-  <p><strong>{{message}}</strong></p>
-  {% endfor %}
-</div>
-{% endif %}
-{% endwith %}
 <!-- end message flash -->
 <div id="fb-root"></div>
         <script>(function(d, s, id) {
@@ -59,10 +48,9 @@ function signInCallback(authResult) {
       success: function(result) {
         // Handle or verify the server response if necessary.
         if (result) {
-          $('#login-googleplus-result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
          setTimeout(function() {
           window.location.href = "/restaurants";
-         }, 4000);
+        }, 1000);
 
       } else if (authResult['error']) {
     console.log('There was an error: ' + authResult['error']);
@@ -114,10 +102,9 @@ function signInCallback(authResult) {
       success: function(result) {
         // Handle or verify the server response if necessary.
         if (result) {
-          $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
          setTimeout(function() {
           window.location.href = "/restaurants";
-         }, 4000);
+        }, 1000);
 
 
       } else {

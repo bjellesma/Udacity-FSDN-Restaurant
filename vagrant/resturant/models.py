@@ -69,6 +69,17 @@ class UsersModel():
     DBSession = sessionmaker(bind = engine)
     session = DBSession()
 
+    '''
+    isLoggedIn will return a boolean true if the user is logged in or false if they are not a user
+    '''
+    @classmethod
+    def isLoggedIn(cls, login_session):
+        #since we require email, a logged in user will always have an email address
+        if 'email' in login_session:
+            return True
+        else:
+            return False
+
     @classmethod
     def createUser(cls, login_session):
         newUser = Users(name=login_session['username'], email=login_session[
