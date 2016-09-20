@@ -1,12 +1,13 @@
 import sys
 #for data types
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Column, ForeignKey, Integer, String, Enum, Text
 #for connecting
 from sqlalchemy.ext.declarative import declarative_base
 #for ForeignKey relationships
 from sqlalchemy.orm import relationship
 #for use at the end of the configuration file
 from sqlalchemy import create_engine
+
 
 Base = declarative_base()
 
@@ -23,29 +24,30 @@ class Users(Base):
     picture = Column(String(80), nullable = False)
 
 """
-The restaurant class is designed to inherit from Base
+The watchlist class is designed to inherit from Base
 """
-class Restaurant(Base):
+class Watchlist(Base):
     #__tablename__ is special in sqlalchemy to let python know the variablename we will use for tables
-    __tablename__ = 'restaurant'
+    __tablename__ = 'watchlist'
     id = Column(Integer, primary_key = True)
     name = Column(String(80), nullable = False)
-    #user_id = Column(Integer, ForeignKey('users.id'))
-    #users = relationship(Users)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    users = relationship(Users)
 
 """
-The MenuItem class is designed to inherit from Base
+The Media class is designed to inherit from Base
 """
-class MenuItem(Base):
-    __tablename__ = 'menu_item'
+class Media(Base):
+    __tablename__ = 'media'
     id = Column(Integer, primary_key = True)
-    name = Column(String(80), nullable = False)
-    course = Column(String(250))
-    description = Column(String(250))
-    price = Column(String(8))
-    restaurant_id = Column(Integer, ForeignKey('restaurant.id'))
+    name = Column(String(250))
+    imdb_id = Column(Integer)
+    type = Column(Enum("Movie", "TV Show"))
+    rating = Column(String(250))
+    comments = Column(Text)
+    watchlist_id = Column(Integer, ForeignKey('watchlist.id'))
     #creating the reference for the ForeignKey to use
-    restaurant = relationship(Restaurant)
+    watchlist = relationship(Watchlist)
     user_id = Column(Integer, ForeignKey('users.id'))
     users = relationship(Users)
 
@@ -57,11 +59,13 @@ class MenuItem(Base):
         return {
             'name': self.name,
             'description': self.description,
-            'id': self.id,
-            'price': self.price,
-            'course': self.course,
+            'imdb_id': self.imdb_id,
+            'type': self.type,
+            'rating': self.rating,
+            'comments': self.comments
         }
+
 #end of file wrap up
-engine = create_engine('sqlite:///restaurantmenu.db')
+engine = create_engine('sqlite:///Watchlists.db')
 #adds the class to the db
 Base.metadata.create_all(engine)
