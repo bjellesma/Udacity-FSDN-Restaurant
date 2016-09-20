@@ -5,7 +5,10 @@
 {% for login in login_session %}
 <p>{{login}}</p>
 {% endfor %}
-{% for restaurant in restaurants %}
-<a href="{{ '/restaurants/%s'%restaurant.id }}"><h1>{{restaurant.name}}</h1></a>
+<!-- END TEST CODE -->
+{% for watchlist in watchlists %}
+<a href="{{ '/watchlists/%s'% watchlist.id }}"><h1>{{watchlist.name}}</h1></a>
 {% endfor %}
+<!--TODO if logged in-->
+<a href="{{ '/watchlists/new'}}"><button type="button">New Watchlist!</button></a><br>
 {% endblock %}

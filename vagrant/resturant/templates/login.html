@@ -1,5 +1,5 @@
 {% extends "partials/base.html" %}
-{% block title %}Edit Menu Item{% endblock %}
+{% block title %}Login{% endblock %}
 
 {% block body %}
 <!-- end message flash -->
@@ -37,7 +37,7 @@ function signInCallback(authResult) {
   if (authResult['code']) {
     // Hide the sign-in button now that the user is authorized
     $('#login-googleplus-signinbutton').attr('style', 'display: none');
-    // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the main restaurants page
+    // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the main watchlists page
     //url is a page that we have on our server
     $.ajax({
       type: 'POST',
@@ -49,7 +49,7 @@ function signInCallback(authResult) {
         // Handle or verify the server response if necessary.
         if (result) {
          setTimeout(function() {
-          window.location.href = "/restaurants";
+          window.location.href = "/watchlists";
         }, 1000);
 
       } else if (authResult['error']) {
@@ -103,7 +103,7 @@ function signInCallback(authResult) {
         // Handle or verify the server response if necessary.
         if (result) {
          setTimeout(function() {
-          window.location.href = "/restaurants";
+          window.location.href = "/watchlists";
         }, 1000);
 
 

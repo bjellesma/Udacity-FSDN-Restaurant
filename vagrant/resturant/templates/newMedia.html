@@ -1,5 +1,5 @@
 {% extends "partials/base.html" %}
-{% block title %}New Menu Item{% endblock %}
+{% block title %}New Media{% endblock %}
 {% block body %}
 <!--MESSAGE FLASH -->
 {% with messages = get_flashed_messages() %}
@@ -13,14 +13,14 @@
 {% endif %}
 {% endwith %}
 <!-- end message flash -->
-<form method='Post' enctype='multipart/form-data' action="{{'/restaurants/%s/newMenuItem/' % restaurant_id}}">
-  <h2>New Menu Item</h2>
+<form method='Post' enctype='multipart/form-data' action="{{'/watchlists/%s/newMedia/' % watchlist_id}}">
+  <h2>New Media</h2>
   Name: <input name='name' type='text' > <br>
-  Course: <input name='course' type='text' > <br>
-  Price: <input name='price' type='text' > <br>
-  Description: <textarea rows='4' cols='40' name='description'></textarea> <br>
+  Rating: <input name='rating' type='text' > <br>
+  Type: <input name='type' type='text' > <br>
+  Comments: <textarea rows='4' cols='40' name='comments'></textarea> <br>
   <input name="user_id" type="hidden" value="{{user_id}}">
   <input type='submit' value='Submit'>
   </form>
-  <a href="{{'/restaurants/%s' % restaurant_id }}"><button type='button'>Cancel</button></a>
+  <a href="{{'/watchlists/%s' % watchlist_id }}"><button type='button'>Cancel</button></a>
 {% endblock %}

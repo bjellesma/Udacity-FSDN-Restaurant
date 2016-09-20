@@ -1,5 +1,5 @@
 {% extends "partials/base.html" %}
-{% block title %}Home{% endblock %}
+{% block title %}Delete Media{% endblock %}
 
 {% block body %}
 <!--MESSAGE FLASH -->
@@ -14,12 +14,12 @@
 {% endif %}
 {% endwith %}
 <!-- end message flash -->
-<form method='Post' enctype='multipart/form-data' action="{{'/menuItem/%s/%s/delete/' % (restaurant_id, menuItem.id) }}">
+<form method='Post' enctype='multipart/form-data' action="{{'/media/%s/%s/delete/' % (watchlist_id, media.id) }}">
   <h2>Delete Menu Item</h2>
   <h2>Are you sure that you want to delete {{menuItem.name}}?</h2>
   <input name='response' type='radio' value='yes'>Yes
   <input name='response' type='radio' value='no'>No
   <input type='submit' value='Submit'>
   </form>
-  <a href="{{'/restaurants/%s' % restaurant_id}}"><button type='button'>Cancel</button></a>
+  <a href="{{'/watchlists/%s' % watchlist_id}}"><button type='button'>Cancel</button></a>
 {% endblock %}

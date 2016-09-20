@@ -1,70 +1,76 @@
 #sqlalchemy modules
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from database_setup import Base, Restaurant, MenuItem, Users
+from database_setup import Base, Watchlist, Media, Users
 
 
 
-class RestaurantModel():
+class WatchlistModel():
     #sqlalchemy code
-    engine = create_engine('sqlite:///restaurantmenu.db')
+    engine = create_engine('sqlite:///Watchlists.db')
     Base.metadata.bind = engine
     DBSession = sessionmaker(bind = engine)
     session = DBSession()
 
     @classmethod
-    def getAllRestaurants(cls):
-        restaurants = cls.session.query(Restaurant).all()
-        return restaurants
+    def getAllWatchlists(cls):
+        watchlists = cls.session.query(Watchlist).all()
+        return watchlists
 
     @classmethod
-    def getRestaurantByID(cls, restaurant_id):
-        restaurant = cls.session.query(Restaurant).filter_by(id = restaurant_id).one()
-        return restaurant
+    def getWatchlistByID(cls, watchlist_id):
+        watchlist = cls.session.query(Watchlist).filter_by(id = watchlist_id).one()
+        return watchlist
 
-class MenuItemModel():
+    @classmethod
+    def postNewWatchlist(cls, name, user_id):
+        watchlist = Watchlist(name = name, user_id = user_id)
+        cls.session.add(watchlist)
+        cls.session.commit()
+
+class MediaModel():
     #sqlalchemy code
-    engine = create_engine('sqlite:///restaurantmenu.db')
+    engine = create_engine('sqlite:///Watchlists.db')
     Base.metadata.bind = engine
     DBSession = sessionmaker(bind = engine)
     session = DBSession()
 
     @classmethod
-    def getAllMenuItems(cls, restaurant_id):
-        items = cls.session.query(MenuItem).filter_by(restaurant_id = restaurant_id)
+    def getAllMediaItems(cls, watchlist_id):
+        items = cls.session.query(Media).filter_by(watchlist_id = watchlist_id)
         return items
 
     @classmethod
-    def postNewMenuItem(cls, restaurant_id, name, course, description, price, user_id):
-        menuItem = MenuItem(name = name, course = course, description = description, price = price, restaurant_id = restaurant_id, user_id = user_id)
-        cls.session.add(menuItem)
+    def postNewMedia(cls, watchlist_id, name, rating, comments, type, user_id):
+        media = Media(name = name, rating = rating, comments = comments, watchlist_id = watchlist_id, type = type, user_id = user_id)
+        cls.session.add(media)
         cls.session.commit()
 
     @classmethod
-    def postEditMenuItem(cls, restaurant_id, menuItem_id, name, course, description, price):
-        menuItem = cls.getMenuItemByID(menuItem_id)
-        menuItem.name = name
-        menuItem.course = course
-        menuItem.description = description
-        menuItem.price = price
-        menuItem.restaurant_id = restaurant_id
-        cls.session.add(menuItem)
+    def postEditMedia(cls, watchlist_id, media_id, name, rating, comments):
+        media = cls.getMediaByID(media_id)
+        media.name = name
+        media.course = course
+        media.description = description
+        media.price = price
+        media.restaurant_id = restaurant_id
+        cls.session.add(media)
         cls.session.commit()
 
     @classmethod
-    def getMenuItemByID(cls, id):
-        menuItem = cls.session.query(MenuItem).filter_by(id = id).one()
-        return menuItem
+    def getMediaByID(cls, id):
+        media = cls.session.query(Media).filter_by(id = id).one()
+        return media
 
     @classmethod
-    def deleteMenuItem(cls, id):
-        menuItem = cls.getMenuItemByID(id)
-        cls.session.delete(menuItem)
+    def deleteMedia(cls, id):
+        media = cls.getMediaByID(id)
+        cls.session.delete(media)
         cls.session.commit()
 
 class UsersModel():
     #sqlalchemy code
-    engine = create_engine('sqlite:///restaurantmenu.db')
+    engine = create_engine('sqlite:///Watchlists.db')
     Base.metadata.bind = engine
     DBSession = sessionmaker(bind = engine)
     session = DBSession()

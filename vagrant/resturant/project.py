@@ -20,14 +20,14 @@ import requests
 #sqlalchemy modules
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from database_setup import Base, Restaurant, MenuItem
+from database_setup import Base, Watchlist, Media
 
 app = Flask(__name__)
 
 #open and read JSON file with client secrets
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
-APPLICATION_NAME = "Restaurant Menu Application"
+APPLICATION_NAME = "Watchlist Application"
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
@@ -230,7 +230,7 @@ def disconnect():
         return redirect('/')
 
 #sqlalchemy code
-engine = create_engine('sqlite:///restaurantmenu.db')
+engine = create_engine('sqlite:///Watchlists.db')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind = engine)
 session = DBSession()
@@ -238,16 +238,16 @@ session = DBSession()
 #JSON route
 #JSON allows applications to easily parse data with the html and css as extra bandwidth
 #JSON is useful for creating APIs because it parses the pure data in a low bandwidth format
-@app.route('/restaurants/<int:restaurant_id>/menu/JSON')
-def restaurantMenuJSON(restaurant_id):
-    restaurant = models.RestaurantModel.getRestaurantByID(restaurant_id)
-    items = models.MenuItemModel.getAllMenuItems(restaurant_id)
-    return jsonify(MenuItems=[i.serialize for i in items])
+@app.route('/watchlist/<int:watchlist_id>/JSON')
+def watchlistJSON(watchlist_id):
+    watchlist = models.WatchlistModel.getWatchlistByID(watchlist_id)
+    media = models.MediaModel.getAllMedia(watchlist_id)
+    return jsonify(Media=[i.serialize for i in items])
 
-@app.route('/restaurants/<int:restaurant_id>/menu/<int:menuItem_id>/JSON')
-def menuItemJSON(restaurant_id, menuItem_id):
-    item = models.MenuItemModel.getMenuItemByID(menuItem_id)
-    return jsonify(MenuItems=[item.serialize])
+@app.route('/watchlists/<int:watchlist_id>/media/<int:media_id>/JSON')
+def mediaJSON(watchlist_id, media_id):
+    media = models.MediaModel.getMediaByID(media_id)
+    return jsonify(Media=[item.serialize])
 
 @app.route('/login')
 
@@ -264,7 +264,7 @@ def showLogin():
 #decorators basically mean that we access functions in an outer scope of nested functions and are able to alter them
 @app.route('/')
 #leanve the trailing slash because flask renders even when not there
-@app.route('/restaurants/')
+@app.route('/watchlists/')
 
 
 
@@ -281,23 +281,12 @@ def homePage():
         username = login_session['username']
         provider = login_session['provider']
         '''
-    restaurants = models.RestaurantModel.getAllRestaurants()
+    watchlists = models.WatchlistModel.getAllWatchlists()
     #TODO login session is test code
-    return render_template('/index.html', restaurants = restaurants, user = user, login_session = login_session)
+    return render_template('/index.html', watchlists = watchlists, user = user, login_session = login_session)
 
-
-@app.route('/restaurants/<int:restaurant_id>/')
-
-def getRestaurants(restaurant_id):
-    #get restaurant
-    restaurant = models.RestaurantModel.getRestaurantByID(restaurant_id)
-    items = models.MenuItemModel.getAllMenuItems(restaurant_id)
-    return render_template('restaurants.html', restaurant = restaurant, items = items)
-
-
-@app.route('/restaurants/<int:restaurant_id>/newMenuItem/', methods=['GET', 'POST'])
-
-def newMenuItem(restaurant_id):
+@app.route('/watchlists/new/', methods=['GET', 'POST'])
+def getNewWatchlist():
     #if user is logged in
     if 'username' not in login_session:
         return redirect ('/login')
@@ -305,50 +294,74 @@ def newMenuItem(restaurant_id):
         user_email = login_session['email']
         user_id = models.UsersModel.getUserID(user_email)
     if request.method =='POST':
-        models.MenuItemModel.postNewMenuItem(request.form['restaurant_id'],
-                        request.form['name'],
-                        request.form['course'],
-                        request.form['description'],
-                        request.form['price'],
+        models.WatchlistModel.postNewWatchlist(request.form['name'],
                         request.form['user_id']
                         )
         flash("%s has been created" % request.form['name'])
-    return render_template('newMenuItem.html', restaurant_id = restaurant_id, user_id = user_id)
+    return render_template('newWatchlist.html', user_id = user_id)
 
-@app.route('/menuItem/<int:restaurant_id>/<int:menuItem_id>/edit/', methods=['GET', 'POST'])
+@app.route('/watchlists/<int:watchlist_id>/')
 
-def editMenuItem(menuItem_id, restaurant_id):
-    menuItem = models.MenuItemModel.getMenuItemByID(menuItem_id)
+def getWatchlist(watchlist_id):
+    #get watchlist
+    watchlist = models.WatchlistModel.getWatchlistByID(watchlist_id)
+    media = models.MediaModel.getAllMediaItems(watchlist_id)
+    return render_template('watchlist.html', watchlist = watchlist, items = media)
+
+
+@app.route('/watchlists/<int:watchlist_id>/newMedia/', methods=['GET', 'POST'])
+
+def newMedia(watchlist_id):
+    #if user is logged in
+    if 'username' not in login_session:
+        return redirect ('/login')
+    else:
+        user_email = login_session['email']
+        user_id = models.UsersModel.getUserID(user_email)
     if request.method =='POST':
-        models.MenuItemModel.postEditMenuItem(restaurant_id,
-                        menuItem_id,
+        models.MediaModel.postNewMedia(watchlist_id,
                         request.form['name'],
-                        request.form['course'],
-                        request.form['description'],
-                        request.form['price']
+                        request.form['rating'],
+                        request.form['comments'],
+                        request.form['type'],
+                        request.form['user_id']
                         )
-        flash("%s has been Updated" % menuItem.name)
-    return render_template('editMenuItem.html', restaurant_id = restaurant_id, menuItem=menuItem)
+        flash("%s has been created" % request.form['name'])
+    return render_template('newMedia.html', watchlist_id = watchlist_id, user_id = user_id)
 
-@app.route('/menuItem/<int:restaurant_id>/<int:menuItem_id>/delete/', methods=['GET', 'POST'])
+@app.route('/media/<int:watchlist_id>/<int:media_id>/edit/', methods=['GET', 'POST'])
 
-def deleteMenuItem(menuItem_id, restaurant_id):
-    menuItem = models.MenuItemModel.getMenuItemByID(menuItem_id)
+def editMedia(media_id, watchlist_id):
+    media = models.MediaModel.getMediaByID(media_id)
+    if request.method =='POST':
+        models.MediaModel.postEditMedia(watchlist_id,
+                        media_id,
+                        request.form['name'],
+                        request.form['rating'],
+                        request.form['comments']
+                        )
+        flash("%s has been Updated" % media.name)
+    return render_template('editMedia.html', watchlist_id = watchlist_id, media=media)
+
+@app.route('/media/<int:watchlist_id>/<int:media_id>/delete/', methods=['GET', 'POST'])
+
+def deleteMedia(media_id, watchlist_id):
+    media = models.MediaModel.getMediaByID(media_id)
     if request.method =='POST':
         if request.form['response'] =='yes':
-            models.MenuItemModel.deleteMenuItem(menuItem_id)
-            redirect("/restaurants/%s" % restaurant_id, code=200)
+            models.MediaModel.deleteMedia(media_id)
+            redirect("/watchlists/%s" % watchlist_id, code=200)
         elif request.form['response'] == 'no':
-            redirect("/restaurants/s" % restaurant_id, code=200)
-        models.MenuItemModel.postEditMenuItem(restaurant_id,
-                        menuItem_id,
+            redirect("/watchlists/%s" % watchlist_id, code=200)
+        models.MediaModel.postEditMedia(watchlist_id,
+                        media_id,
                         request.form['name'],
-                        request.form['course'],
-                        request.form['description'],
+                        request.form['rating'],
+                        request.form['comments'],
                         request.form['price']
                         )
-        flash("%s has been deleted" % menuItem.name)
-    return render_template('deleteMenuItem.html', restaurant_id = restaurant_id, menuItem=menuItem)
+        flash("%s has been deleted" % media.name)
+    return render_template('deleteMedia.html', watchlist_id = watchlist_id, media=media)
 if __name__ == "__main__":
     app.secret_key = secure.secret
     #enabling debug mode allows the server to reload itself each time it notices a change in its code

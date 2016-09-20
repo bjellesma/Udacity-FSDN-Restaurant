@@ -1,6 +1,6 @@
 import sys
 #for data types
-from sqlalchemy import Column, ForeignKey, Integer, String, Enum, Text
+from sqlalchemy import Column, ForeignKey, Integer, String, Enum, Text, SmallInteger
 #for connecting
 from sqlalchemy.ext.declarative import declarative_base
 #for ForeignKey relationships
@@ -42,8 +42,8 @@ class Media(Base):
     id = Column(Integer, primary_key = True)
     name = Column(String(250))
     imdb_id = Column(Integer)
-    type = Column(Enum("Movie", "TV Show"))
-    rating = Column(String(250))
+    type = Column(String(250))
+    rating = Column(SmallInteger)
     comments = Column(Text)
     watchlist_id = Column(Integer, ForeignKey('watchlist.id'))
     #creating the reference for the ForeignKey to use
