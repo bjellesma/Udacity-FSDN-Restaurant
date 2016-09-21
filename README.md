@@ -1,4 +1,4 @@
-# Udacity-FSDN-Restaurant
+# Udacity-FSDN-Watchlist
 ## Table Of Contents
 * [What Is This](#What-is-this "What is this")
 * [Prerequisites](#Prerequisites "Prerequisites")
@@ -20,6 +20,9 @@
 * `vagrant ssh`
 * create a secret session key in secure_sample.py
 * once you have created the session key, remove `_sample` from secure_sample.py
+* navigate to the directory with `cd /vagrant/watchlist`
+* run the server with `python project.py`
+* navigate to localhost:5000 in a browser to view the website
 
 
 <a name="Author"><h1>Author</h1></a>
