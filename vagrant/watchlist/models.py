@@ -2,8 +2,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Watchlist, Media, Users
-
-
+#IMDb imports
+import imdb
 
 class WatchlistModel():
     #sqlalchemy code
@@ -34,6 +34,9 @@ class MediaModel():
     Base.metadata.bind = engine
     DBSession = sessionmaker(bind = engine)
     session = DBSession()
+
+    #IMDb object
+    imdbObj = imdb.IMDb()
 
     @classmethod
     def getAllMediaItems(cls, watchlist_id):
@@ -67,6 +70,12 @@ class MediaModel():
         media = cls.getMediaByID(id)
         cls.session.delete(media)
         cls.session.commit()
+
+    #IMDb info
+    @classmethod
+    def getIMDBbyID(cls, id):
+        obj = cls.imdbObj.get_movie(id)
+        return obj
 
 class UsersModel():
     #sqlalchemy code

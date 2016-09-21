@@ -4,12 +4,16 @@
 <h1>{{watchlist.name}}</h1>
 <a href="{{'/watchlists/%s/newMedia/'% watchlist.id}}"><button type='button'>Create New Media</button></a>
 <p>Click an item name to edit it</p>
-{% for item in items %}
+{% for item, imdbItem in items_imdb %}
 <div class ='row'>
-  <div class='col-md-9'><p><a href="{{'/media/%s/%s/edit' % (watchlist.id, item.id)}}">{{item.name}}</p></a></div>
-  <div class='col-md-3'><p>{{item.rating}}</p></div>
+  <div class='col-md-2'><img src="{{imdbItem.get('%s' % ('cover url'))}}" /></div>
+  <div class='col-md-10'>
+    <div class='col-md-12'><h1><a href="{{'/media/%s/%s/edit' % (watchlist.id, item.id)}}">{{item.name}}</h1></a></div>
+    <div class='col-md-12'><p>User Review:{{item.rating}}</p></div>
+    <div class="col-md-12"><p>User Comments:{{item.comments}}</p></div>
+  </div>
 </div>
-<div class="col-md-12">{{item.comments}}</div>
+
 <a href="{{'/media/%s/%s/delete/' % (watchlist.id, item.id)}}"><button type='button'>Delete</button></a>
 <br>
 {% endfor %}

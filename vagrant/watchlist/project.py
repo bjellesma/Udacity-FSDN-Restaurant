@@ -306,7 +306,11 @@ def getWatchlist(watchlist_id):
     #get watchlist
     watchlist = models.WatchlistModel.getWatchlistByID(watchlist_id)
     media = models.MediaModel.getAllMediaItems(watchlist_id)
-    return render_template('watchlist.html', watchlist = watchlist, items = media)
+    imdbMedia = []
+    for medium in media:
+        imdbMedium = models.MediaModel.getIMDBbyID(medium.imdb_id)
+        imdbMedia.append(imdbMedium)
+    return render_template('watchlist.html', watchlist = watchlist, items_imdb = zip(media, imdbMedia))
 
 
 @app.route('/watchlists/<int:watchlist_id>/newMedia/', methods=['GET', 'POST'])

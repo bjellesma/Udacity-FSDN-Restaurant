@@ -20,7 +20,8 @@
   Type: <input name='type' type='text' > <br>
   Comments: <textarea rows='4' cols='40' name='comments'></textarea> <br>
   <input name="user_id" type="hidden" value="{{user_id}}">
-  <input type='submit' value='Submit'>
+  <!-- TODO ajax call for imdb objects -->
+  <input type='submit' value='Submit' disabled>
   </form>
   <a href="{{'/watchlists/%s' % watchlist_id }}"><button type='button'>Cancel</button></a>
 {% endblock %}
