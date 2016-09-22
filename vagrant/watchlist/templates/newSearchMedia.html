@@ -1,0 +1,24 @@
+{% extends "partials/base.html" %}
+{% block title %}Media Search{% endblock %}
+{% block body %}
+<!--MESSAGE FLASH -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+
+<div class="message_flash">
+{% for message in messages %}
+  <p><strong>{{message}}</strong></p>
+  {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+<!-- end message flash -->
+  <h2>Search</h2>
+  Title: <span><input type='text' id="watchlist_search_title"></span> <br>
+  <button type="button" id="watchlist_search_button">
+    <a href="javascript:watchlist_search({{ watchlist_id }});">Search</a>
+  </button>
+  <!-- A box to return any information via ajax -->
+  <img id="watchlist_search_loading" style="display: none" src="/static/img/loading.gif">
+  <div id="watchlist_search_box"></div>
+{% endblock %}

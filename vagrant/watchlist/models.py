@@ -77,6 +77,12 @@ class MediaModel():
         obj = cls.imdbObj.get_movie(id)
         return obj
 
+    @classmethod
+    def searchIMDBbyMovie(cls, movie):
+        result = cls.imdbObj.search_movie(movie)
+        id = result[0].movieID
+        return id
+
 class UsersModel():
     #sqlalchemy code
     engine = create_engine('sqlite:///Watchlists.db')

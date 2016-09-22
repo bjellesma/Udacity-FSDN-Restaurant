@@ -333,6 +333,16 @@ def newMedia(watchlist_id):
         flash("%s has been created" % request.form['name'])
     return render_template('newMedia.html', watchlist_id = watchlist_id, user_id = user_id)
 
+@app.route('/watchlists/<int:watchlist_id>/newMedia/search', methods=['GET'])
+def getNewSearchMedia(watchlist_id):
+    return render_template('newSearchMedia.html', watchlist_id = watchlist_id)
+
+@app.route('/watchlists/<int:watchlist_id>/newMedia/search', methods=['POST'])
+def postNewSearchMedia(watchlist_id):
+    movieID = models.MediaModel.searchIMDBbyMovie(request.form['title'])
+    movieInfo = models.MediaModel.getIMDBbyID(int(movieID))
+    return movieInfo['cover url']
+
 @app.route('/media/<int:watchlist_id>/<int:media_id>/edit/', methods=['GET', 'POST'])
 
 def editMedia(media_id, watchlist_id):
