@@ -6,18 +6,21 @@
   <script src="//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js">
   </script>
   <script>
-  function watchlist_search(watchlist_id) {
+  function watchlist_search(watchlist_id, searchInt) {
       $('#watchlist_search_box').hide();
       $('#watchlist_search_loading').show();
-
       $.ajax({
          url: '/watchlists/' + watchlist_id + '/newMedia/search',
          type: "post",
-         data: {'title': $('#watchlist_search_title').val()},
-         success: function(picture){
-             $('#watchlist_search_box').append('<img src='+ picture + '>');
+         data: {'title': $('#watchlist_search_title').val(), 'searchInt': searchInt},
+         success: function(imdbJSON){
+             $('#watchlist_search_box').html('<img src='+ imdbJSON['cover'] + '><br><p>' + imdbJSON['description'] + '</p>');
              $('#watchlist_search_loading').hide();
              $('#watchlist_search_box').show();
+
+             //edit the link so that it can send the user back to the add page with the proper id
+             $('#watchlist_search_link').attr("href", "/watchlists/" + watchlist_id + "/newMedia?id=" + imdbJSON['id'] + "&title=" + imdbJSON['title'])
+             $('#watchlist_search_done').show();
          }
       });
 

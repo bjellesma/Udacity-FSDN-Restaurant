@@ -313,7 +313,7 @@ def getWatchlist(watchlist_id):
     return render_template('watchlist.html', watchlist = watchlist, items_imdb = zip(media, imdbMedia))
 
 
-@app.route('/watchlists/<int:watchlist_id>/newMedia/', methods=['GET', 'POST'])
+@app.route('/watchlists/<int:watchlist_id>/newMedia/', methods=['GET'])
 
 def newMedia(watchlist_id):
     #if user is logged in
@@ -322,16 +322,30 @@ def newMedia(watchlist_id):
     else:
         user_email = login_session['email']
         user_id = models.UsersModel.getUserID(user_email)
+    if request.method =='GET':
+        #for a get variable, it's a lot easier to tell if it exists
+        if request.args.get('id') and request.args.get('title'):
+            imdb_id = request.args.get('id')
+            imdb_title = request.args.get('title')
+        else:
+            imdb_id = ''
+            imdb_title = ''
+
+        flash("%s has been created" % request.form['name'])
+    return render_template('newMedia.html', watchlist_id = watchlist_id, user_id = user_id, imdb_id = imdb_id, imdb_title = imdb_title)
+
+@app.route('/watchlists/<int:watchlist_id>/newMedia/', methods=['POST'])
+def postNewMedia(watchlist_id):
     if request.method =='POST':
         models.MediaModel.postNewMedia(watchlist_id,
                         request.form['name'],
+                        request.form['imdb_id'],
                         request.form['rating'],
                         request.form['comments'],
                         request.form['type'],
                         request.form['user_id']
                         )
-        flash("%s has been created" % request.form['name'])
-    return render_template('newMedia.html', watchlist_id = watchlist_id, user_id = user_id)
+    return redirect("/watchlists/%s" % watchlist_id, code=200)
 
 @app.route('/watchlists/<int:watchlist_id>/newMedia/search', methods=['GET'])
 def getNewSearchMedia(watchlist_id):
@@ -339,9 +353,14 @@ def getNewSearchMedia(watchlist_id):
 
 @app.route('/watchlists/<int:watchlist_id>/newMedia/search', methods=['POST'])
 def postNewSearchMedia(watchlist_id):
-    movieID = models.MediaModel.searchIMDBbyMovie(request.form['title'])
+    movieID = models.MediaModel.searchIMDBbyMovie(request.form['title'], int(request.form['searchInt']))
     movieInfo = models.MediaModel.getIMDBbyID(int(movieID))
-    return movieInfo['cover url']
+    return jsonify({
+        'title': movieInfo['title'],
+        'cover': movieInfo['cover'],
+        'id': movieID,
+        'description': movieInfo['plot summary']
+    })
 
 @app.route('/media/<int:watchlist_id>/<int:media_id>/edit/', methods=['GET', 'POST'])
 
