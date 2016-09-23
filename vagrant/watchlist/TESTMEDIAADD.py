@@ -22,10 +22,10 @@ for medium in media:
     session.delete(medium)
     session.commit()
 print 'Previous items deleted'
-game_of_thrones = Media(name="Game of Thrones", imdb_id = int('0944947'), type = "TV Show", rating = int('2'),
+game_of_thrones = Media(name="Game of Thrones", art="http://placehold.it/350x150", imdb_id = int('0944947'), type = "TV Show", rating = int('2'),
                 comments="An amazing show", watchlist_id= int('1'), user_id="1")
 
-seinfeld = Media(name="Seinfeld", imdb_id = int('0098904'), type = "TV Show", rating = int('2'),
+seinfeld = Media(name="Seinfeld", art="http://placehold.it/350x150", imdb_id = int('0098904'), type = "TV Show", rating = int('2'),
                 comments="An amazing show", watchlist_id= int('1'), user_id="1")
 
 session.add(game_of_thrones)

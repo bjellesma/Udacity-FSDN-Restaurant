@@ -19,7 +19,7 @@
              $('#watchlist_search_box').show();
 
              //edit the link so that it can send the user back to the add page with the proper id
-             $('#watchlist_search_link').attr("href", "/watchlists/" + watchlist_id + "/newMedia?id=" + imdbJSON['id'] + "&title=" + imdbJSON['title'])
+             $('#watchlist_search_link').attr("href", "/watchlists/" + watchlist_id + "/newMedia?id=" + imdbJSON['id'] + "&title=" + imdbJSON['title'] + "&art=" + imdbJSON['cover'])
              $('#watchlist_search_done').show();
          }
       });

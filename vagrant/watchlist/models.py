@@ -44,8 +44,8 @@ class MediaModel():
         return items
 
     @classmethod
-    def postNewMedia(cls, watchlist_id, name, imdb_id, rating, comments, type, user_id):
-        media = Media(name = name, rating = rating, imdb_id = imdb_id, comments = comments, watchlist_id = watchlist_id, type = type, user_id = user_id)
+    def postNewMedia(cls, watchlist_id, name, art, imdb_id, rating, comments, type, user_id):
+        media = Media(name = name, rating = rating, art = art, imdb_id = imdb_id, comments = comments, watchlist_id = watchlist_id, type = type, user_id = user_id)
         cls.session.add(media)
         cls.session.commit()
 
@@ -82,6 +82,11 @@ class MediaModel():
         result = cls.imdbObj.search_movie(movie)
         id = result[0].movieID
         return id
+
+    @classmethod
+    def getIMDBcoverById(cls, id):
+        obj = cls.getIMDBbyID(id)
+        return obj['cover']
 
 class UsersModel():
     #sqlalchemy code

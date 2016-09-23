@@ -38,10 +38,11 @@ class Watchlist(Base):
 The Media class is designed to inherit from Base
 """
 class Media(Base):
-    __tablename__ = 'media'
+    __tablename__ = 'mdia'
     id = Column(Integer, primary_key = True)
     name = Column(String(250))
     imdb_id = Column(Integer)
+    art = Column(String(250))
     type = Column(String(250))
     rating = Column(SmallInteger)
     comments = Column(Text)

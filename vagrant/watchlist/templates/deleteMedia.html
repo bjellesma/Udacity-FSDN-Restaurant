@@ -15,8 +15,8 @@
 {% endwith %}
 <!-- end message flash -->
 <form method='Post' enctype='multipart/form-data' action="{{'/media/%s/%s/delete/' % (watchlist_id, media.id) }}">
-  <h2>Delete Menu Item</h2>
-  <h2>Are you sure that you want to delete {{menuItem.name}}?</h2>
+  <h2>Delete Media</h2>
+  <h2>Are you sure that you want to delete {{media.name}}?</h2>
   <input name='response' type='radio' value='yes'>Yes
   <input name='response' type='radio' value='no'>No
   <input type='submit' value='Submit'>

@@ -306,11 +306,7 @@ def getWatchlist(watchlist_id):
     #get watchlist
     watchlist = models.WatchlistModel.getWatchlistByID(watchlist_id)
     media = models.MediaModel.getAllMediaItems(watchlist_id)
-    imdbMedia = []
-    for medium in media:
-        imdbMedium = models.MediaModel.getIMDBbyID(medium.imdb_id)
-        imdbMedia.append(imdbMedium)
-    return render_template('watchlist.html', watchlist = watchlist, items_imdb = zip(media, imdbMedia))
+    return render_template('watchlist.html', watchlist = watchlist, items = media)
 
 
 @app.route('/watchlists/<int:watchlist_id>/newMedia/', methods=['GET'])
@@ -324,15 +320,16 @@ def newMedia(watchlist_id):
         user_id = models.UsersModel.getUserID(user_email)
     if request.method =='GET':
         #for a get variable, it's a lot easier to tell if it exists
-        if request.args.get('id') and request.args.get('title'):
+        if request.args.get('id') and request.args.get('title') and request.args.get('art'):
             imdb_id = request.args.get('id')
             imdb_title = request.args.get('title')
+            imdb_art = request.args.get('art')
         else:
             imdb_id = ''
             imdb_title = ''
-
+            imdb_art = 'http://placehold.it/350x150'
         flash("%s has been created" % request.form['name'])
-    return render_template('newMedia.html', watchlist_id = watchlist_id, user_id = user_id, imdb_id = imdb_id, imdb_title = imdb_title)
+    return render_template('newMedia.html', watchlist_id = watchlist_id, user_id = user_id, imdb_id = imdb_id, imdb_title = imdb_title, imdb_cover = imdb_art)
 
 @app.route('/watchlists/<int:watchlist_id>/newMedia/', methods=['POST'])
 def postNewMedia(watchlist_id):
@@ -340,6 +337,7 @@ def postNewMedia(watchlist_id):
         models.MediaModel.postNewMedia(watchlist_id,
                         request.form['name'],
                         request.form['imdb_id'],
+                        request.form['imdb_art'],
                         request.form['rating'],
                         request.form['comments'],
                         request.form['type'],
@@ -383,17 +381,10 @@ def deleteMedia(media_id, watchlist_id):
     if request.method =='POST':
         if request.form['response'] =='yes':
             models.MediaModel.deleteMedia(media_id)
-            redirect("/watchlists/%s" % watchlist_id, code=200)
-        elif request.form['response'] == 'no':
-            redirect("/watchlists/%s" % watchlist_id, code=200)
-        models.MediaModel.postEditMedia(watchlist_id,
-                        media_id,
-                        request.form['name'],
-                        request.form['rating'],
-                        request.form['comments'],
-                        request.form['price']
-                        )
+
+
         flash("%s has been deleted" % media.name)
+        return redirect("/watchlists/%s" % watchlist_id, code=200)
     return render_template('deleteMedia.html', watchlist_id = watchlist_id, media=media)
 if __name__ == "__main__":
     app.secret_key = secure.secret
