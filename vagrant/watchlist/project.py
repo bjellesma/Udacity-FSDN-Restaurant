@@ -249,7 +249,7 @@ def mediaJSON(watchlist_id, media_id):
     media = models.MediaModel.getMediaByID(media_id)
     return jsonify(Media=[item.serialize])
 
-@app.route('/login')
+@app.route('/login', methods=['GET'])
 
 def showLogin():
     #the state variable will be 32 characters and be a mix of uppercase letters and digits
@@ -258,6 +258,13 @@ def showLogin():
     login_session['state'] = state
     return render_template('/login.html', STATE=state)
 
+@app.route('/login', methods=['POST'])
+
+@app.route('/register', methods=['GET'])
+def getRegister():
+    return render_template('/register.html')
+
+@app.route('/register', methods=['POST'])
 #routing
 #notice status codes are no longer needed
 # the @ means decorator function in python

@@ -2,7 +2,39 @@
 {% block title %}Login{% endblock %}
 
 {% block body %}
+<!--MESSAGE FLASH -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+
+<div class="message_flash">
+{% for message in messages %}
+  <li><strong>{{message}}</strong></li>
+  {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
 <!-- end message flash -->
+<div id="watchlist_login">
+  <h2>Login</h2>
+    <form method="post" id="watchlist_login_form">
+          <p>
+            Username:
+            <input type="text" name="username" value="{{username}}">
+            <span class="error">{{error_username}}</span>
+          </p>
+          <p>
+            Password:
+            <input type="password" name="password" value="">
+            <span class="error">{{error_password}}</span>
+          </p>
+      <!--TODO-->
+      <p>Don't have an account? <a href="register">Register</a></p>
+      <!--TODO-->
+      <p>Forgot Password? <a href="register">Reset</a></p>
+
+      <input type="submit">
+    </form>
+</div>
 <div id="fb-root"></div>
         <script>(function(d, s, id) {
           var js, fjs = d.getElementsByTagName(s)[0];
@@ -130,4 +162,5 @@ function signInCallback(authResult) {
 
 <div id="status">
 </div>
+
 {% endblock %}

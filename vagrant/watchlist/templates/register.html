@@ -1,0 +1,44 @@
+{% extends "partials/base.html" %}
+{% block title %}Register{% endblock %}
+<!--MESSAGE FLASH -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+
+<div class="message_flash">
+{% for message in messages %}
+  <li><strong>{{message}}</strong></li>
+  {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+<!-- end message flash -->
+{% block body %}
+<h2>Register</h2>
+<div id="watchlist_register">
+  <form method="post" id="watchlist_register_form">
+    {{user_conflict}}
+      <p>
+        Username:
+        <input type="text" name="username" value="{{username}}">
+        <span class="error">{{error_username}}</span>
+      </p>
+      <p>
+        Password
+        <input type="password" name="password" value="">
+        <span class="error">{{error_password}}</span>
+      </p>
+      <p>
+        Verify Password
+        <input type="password" name="verify" value="">
+        <span class="error">{{error_verify}}</span>
+      </p>
+      <p>
+        Email
+        <input type="text" name="email" value="{{email}}">
+        <span class="error">{{error_email}}
+      </p>
+    <input type="submit">
+    <a href="login"><button type="button">Login</button></a>
+  </form>
+</div>
+{% endblock %}

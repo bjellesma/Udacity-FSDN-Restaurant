@@ -127,3 +127,20 @@ class UsersModel():
             return user.id
         except:
             return None
+
+class PasswordsModel():
+    #sqlalchemy code
+    engine = create_engine('sqlite:///Watchlists.db')
+    Base.metadata.bind = engine
+    DBSession = sessionmaker(bind = engine)
+    session = DBSession()
+
+    @classmethod
+    def getPasswordById(cls, id):
+        user = cls.session.query(Password).filter_by(user_id = id).one()
+        return user.password
+
+    @classmethod
+    def getSaltById(cls, id):
+        user = cls.session.query(Password).filter_by(user_id = id).one()
+        return user.salt
