@@ -1,9 +1,11 @@
 #sqlalchemy modules
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from database_setup import Base, Watchlist, Media, Users
+from database_setup import Base, Watchlist, Media, Users, Passwords
 #IMDb imports
 import imdb
+#app imports
+import functions
 
 class WatchlistModel():
     #sqlalchemy code
@@ -95,6 +97,11 @@ class UsersModel():
     DBSession = sessionmaker(bind = engine)
     session = DBSession()
 
+    def login(cls, name, pw):
+        user = cls.getUserByName(name)
+        if user and functions.checkLoginPassword(name, pw, PasswordsModel.getPasswordById(user.id)):
+            return user
+
     '''
     isLoggedIn will return a boolean true if the user is logged in or false if they are not a user
     '''
@@ -107,7 +114,17 @@ class UsersModel():
             return False
 
     @classmethod
-    def createUser(cls, login_session):
+    def register(cls, name, pw, email):
+        pw_hash = functions.make_pw_hash(name, pw)
+        newUser = Users(provider="watchlist", username=name, email=email)
+        cls.session.add(newUser)
+        cls.session.commit()
+        user = cls.getUserByName(name)
+        userPassword = PasswordsModel.newPasswordById(user.id, pw_hash)
+        return user
+
+    @classmethod
+    def createOauthUser(cls, login_session):
         newUser = Users(name=login_session['username'], email=login_session[
                        'email'], picture=login_session['picture'])
         cls.session.add(newUser)
@@ -128,12 +145,39 @@ class UsersModel():
         except:
             return None
 
+    @classmethod
+    def getUserByName(cls, name):
+        try:
+            user = cls.session.query(Users).filter_by(username=name).one()
+            return user
+        except:
+            return None
+
+    @classmethod
+    def getUserNameById(cls, id):
+        user = cls.session.query(Users).filter_by(id = id).one()
+        return user.userName
+
+    @classmethod
+    def checkUserName(cls, username):
+        try:
+            user = cls.session.query(Users).filter_by(username = username).one()
+            return "Sorry, that username exists"
+        except:
+            return None
+
 class PasswordsModel():
     #sqlalchemy code
     engine = create_engine('sqlite:///Watchlists.db')
     Base.metadata.bind = engine
     DBSession = sessionmaker(bind = engine)
     session = DBSession()
+
+    @classmethod
+    def newPasswordById(cls, id, password):
+        newPassword = Passwords(user_id=id, password = password)
+        cls.session.add(newPassword)
+        cls.session.commit()
 
     @classmethod
     def getPasswordById(cls, id):

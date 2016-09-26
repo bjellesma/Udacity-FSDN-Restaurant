@@ -20,9 +20,9 @@ class Users(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key = True)
     provider = Column(String(80), nullable = False)
-    userName = Column(String(80), nullable = False)
+    username = Column(String(80), nullable = False)
     email = Column(String(80), nullable = False)
-    picture = Column(String(80), nullable = False)
+    picture = Column(String(80))
 
 class Passwords(Base):
     __tablename__ = 'passwords'
@@ -30,7 +30,6 @@ class Passwords(Base):
     user_id = Column(Integer, ForeignKey('users.id'))
     users = relationship(Users)
     password = Column(String(255), nullable = False)
-    salt = Column(String(255), nullable = False)
 
 """
 The watchlist class is designed to inherit from Base
@@ -47,7 +46,7 @@ class Watchlist(Base):
 The Media class is designed to inherit from Base
 """
 class Media(Base):
-    __tablename__ = 'mdia'
+    __tablename__ = 'media'
     id = Column(Integer, primary_key = True)
     name = Column(String(250))
     imdb_id = Column(Integer)

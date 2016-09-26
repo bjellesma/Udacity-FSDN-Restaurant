@@ -5,6 +5,7 @@ from flask import Flask, request, redirect, render_template, flash, jsonify
 #app imports
 import models
 import secure
+import functions
 
 #modules for oauth security
 #notice that we can't use session because we're already using it so we use the keyword as
@@ -259,12 +260,66 @@ def showLogin():
     return render_template('/login.html', STATE=state)
 
 @app.route('/login', methods=['POST'])
+def postLogin():
+    username = request.form['username']
+    password = request.form['password']
+
+    successful_login = models.UsersModel.login(username, password)
+    #if we were able to validate the user
+    #login the user and direct them to the main page
+    if successful_login:
+        #refers to the login handler function
+        #you can also tell by the parameters
+        models.UsersModel.login(successful_login)
+        return redirect ('/')
+    #else, spit out the errors
+    else:
+        error = 'That username and/or password is invalid'
+        return render_template('/login.html', error = error)
 
 @app.route('/register', methods=['GET'])
 def getRegister():
     return render_template('/register.html')
 
 @app.route('/register', methods=['POST'])
+def postRegister():
+    #assume no error
+    have_error = False
+    username = request.form['username']
+    password = request.form['password']
+    verify = request.form['verify']
+    email = request.form['email']
+
+    notUniqueUser = models.UsersModel.checkUserName(username)
+
+    params = dict(username = username,
+                      email = email)
+
+    if not functions.valid_username(username):
+        params['error_username'] = "That's not a valid username."
+        have_error = True
+
+    if not functions.valid_password(password):
+        params['error_password'] = "That wasn't a valid password."
+        have_error = True
+    elif password != verify:
+        params['error_verify'] = "Your passwords didn't match."
+        have_error = True
+
+    if not functions.valid_email(email):
+        params['error_email'] = "That's not a valid email."
+        have_error = True
+
+    if notUniqueUser:
+        params['user_conflict'] = "That user already exists. Please pick another username"
+        have_error = True
+
+    if have_error:
+        return render_template('/register.html', params = params)
+    else:
+        user = models.UsersModel.register(username, password, email)
+        models.UsersModel.login(user.username, password)
+        return redirect ('/login')
 #routing
 #notice status codes are no longer needed
 # the @ means decorator function in python
