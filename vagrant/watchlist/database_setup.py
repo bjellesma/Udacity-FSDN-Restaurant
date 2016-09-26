@@ -19,9 +19,18 @@ The Users class is designed to inherit from Base
 class Users(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key = True)
-    name = Column(String(80), nullable = False)
+    provider = Column(String(80), nullable = False)
+    userName = Column(String(80), nullable = False)
     email = Column(String(80), nullable = False)
     picture = Column(String(80), nullable = False)
+
+class Passwords(Base):
+    __tablename__ = 'passwords'
+    id = Column(Integer, primary_key = True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    users = relationship(Users)
+    password = Column(String(255), nullable = False)
+    salt = Column(String(255), nullable = False)
 
 """
 The watchlist class is designed to inherit from Base
