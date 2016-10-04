@@ -113,6 +113,7 @@ class UsersModel():
     @classmethod
     def isLoggedIn(cls, login_session):
         #since we require email, a logged in user will always have an email address
+        #TODO may be a security hole
         if 'email' in login_session:
             return True
         else:

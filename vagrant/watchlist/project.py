@@ -296,9 +296,10 @@ def postLogin():
         cookie_val = functions.make_secure_val(successful_login.id)
         expire_date = datetime.datetime.now()
         expire_date = expire_date + datetime.timedelta(days=90)
+        #set cookie for 90 days
         response.set_cookie(
             'Watchlist-login',
-            '%s=%s' % ('user_id', cookie_val),
+            '%s' % cookie_val,
             expires=expire_date)
         return response
 
@@ -362,10 +363,14 @@ def postRegister():
 
 
 def homePage():
-
-    uid = functions.read_secure_cookie('user_id')
-    user = uid and models.UsersModel.getUserById(int(uid))
-
+    #if user has previous cookie
+    uid = functions.read_secure_cookie('Watchlist-login')
+    if uid:
+        user = uid and models.UsersModel.getUserById(int(uid))
+        #set session
+        login_session['provider'] = 'watchlist'
+        login_session['username'] = user.username
+        login_session['email'] = user.email
     if models.UsersModel.isLoggedIn(login_session):
         user = models.UsersModel.getUserInfo(models.UsersModel.getUserID(login_session['email']))
     else:

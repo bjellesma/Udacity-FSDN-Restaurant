@@ -37,7 +37,7 @@ def set_secure_cookie(name, user_id):
     expire_date = expire_date + datetime.timedelta(days=90)
     response.set_cookie(
         'Watchlist-login',
-        '%s=%s' % (name, cookie_val))
+        '%s' % cookie_val)
     return response
 """
 Args: self (class reference), name (string)
@@ -46,8 +46,6 @@ function to read cookie of user
 """
 def read_secure_cookie(name):
     cookie_val = request.cookies.get(name)
-    if cookie_val:
-        print "cookie found"
     return cookie_val and check_secure_val(cookie_val)
 
 """
