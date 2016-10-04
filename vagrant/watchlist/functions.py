@@ -4,7 +4,8 @@ Author: William Jellesma
 
 This file houses all of the commonly used functions such as verification for usernames and passwords
 """
-
+#flask imports
+from flask import Flask, redirect, request, make_response
 #security modules
 import random
 import hashlib
@@ -12,12 +13,42 @@ import hmac
 from string import letters
 import secure
 
+
+
+
 #OS modules
 import os
 import re
 
 #app imports
 import secure
+
+app = Flask(__name__)
+
+"""
+Args: self (class reference), name (string), user_id (integer)
+
+function to create cookie based on user id
+"""
+def set_secure_cookie(name, user_id):
+    response = make_response(redirect('/'))
+    cookie_val = make_secure_val(user_id)
+    expire_date = datetime.datetime.now()
+    expire_date = expire_date + datetime.timedelta(days=90)
+    response.set_cookie(
+        'Watchlist-login',
+        '%s=%s' % (name, cookie_val))
+    return response
+"""
+Args: self (class reference), name (string)
+
+function to read cookie of user
+"""
+def read_secure_cookie(name):
+    cookie_val = request.cookies.get(name)
+    if cookie_val:
+        print "cookie found"
+    return cookie_val and check_secure_val(cookie_val)
 
 """
 Args: length (Integer, default = 5)
@@ -64,7 +95,7 @@ Returns:
 secure value for use in creating cookies based on the global secret value and the user's id
 """
 def make_secure_val(user_id):
-    return '%s|%s' % (user_id, hmac.new(secret, user_id).hexdigest())
+    return '%s|%s' % (user_id, hmac.new(secret, str(user_id)).hexdigest())
 
 """
 Args: secure_val (integer)

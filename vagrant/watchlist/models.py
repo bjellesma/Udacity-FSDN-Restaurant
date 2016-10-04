@@ -97,10 +97,15 @@ class UsersModel():
     DBSession = sessionmaker(bind = engine)
     session = DBSession()
 
-    def login(cls, name, pw):
-        user = cls.getUserByName(name)
-        if user and functions.checkLoginPassword(name, pw, PasswordsModel.getPasswordById(user.id)):
+    @classmethod
+    def login(cls, email, pw):
+        user = cls.getUserByEmail(email)
+        if user and functions.checkLoginPassword(user.username, pw, PasswordsModel.getPasswordById(user.id)):
             return user
+
+    @classmethod
+    def logout(cls):
+        functions.set_secure_cookie(' ', ' ')
 
     '''
     isLoggedIn will return a boolean true if the user is logged in or false if they are not a user
@@ -154,9 +159,22 @@ class UsersModel():
             return None
 
     @classmethod
+    def getUserByEmail(cls, email):
+        try:
+            user = cls.session.query(Users).filter_by(email=email).one()
+            return user
+        except:
+            return None
+
+    @classmethod
     def getUserNameById(cls, id):
         user = cls.session.query(Users).filter_by(id = id).one()
         return user.userName
+
+    @classmethod
+    def getUserById(cls, id):
+        user = cls.session.query(Users).filter_by(id = id).one()
+        return user
 
     @classmethod
     def checkUserName(cls, username):
@@ -181,10 +199,10 @@ class PasswordsModel():
 
     @classmethod
     def getPasswordById(cls, id):
-        user = cls.session.query(Password).filter_by(user_id = id).one()
+        user = cls.session.query(Passwords).filter_by(user_id = id).one()
         return user.password
 
     @classmethod
     def getSaltById(cls, id):
-        user = cls.session.query(Password).filter_by(user_id = id).one()
+        user = cls.session.query(Passwords).filter_by(user_id = id).one()
         return user.salt

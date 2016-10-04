@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template, flash, jsonify
+from flask import Flask, request, redirect, render_template, flash, jsonify, make_response
 #create instance of flask class with the name of the app
 
 
@@ -6,6 +6,9 @@ from flask import Flask, request, redirect, render_template, flash, jsonify
 import models
 import secure
 import functions
+
+#cookies
+import datetime
 
 #modules for oauth security
 #notice that we can't use session because we're already using it so we use the keyword as
@@ -265,17 +268,31 @@ def postLogin():
     password = request.form['password']
 
     successful_login = models.UsersModel.login(username, password)
+
     #if we were able to validate the user
     #login the user and direct them to the main page
+    #refers to the login handler function
+    #you can also tell by the parameters
     if successful_login:
-        #refers to the login handler function
-        #you can also tell by the parameters
-        models.UsersModel.login(successful_login)
-        return redirect ('/')
+        #set session
+        login_session['provider'] = 'watchlist'
+        login_session['username'] = successful_login.username
+        login_session['email'] = successful_login.email
+        #set cookie
+        #we need to set the cookie in here or else it will not set properly
+        response = make_response(redirect('/'))
+        cookie_val = functions.make_secure_val(successful_login.id)
+        expire_date = datetime.datetime.now()
+        expire_date = expire_date + datetime.timedelta(days=90)
+        response.set_cookie(
+            'Watchlist-login',
+            '%s=%s' % ('user_id', cookie_val))
+        return response
+
     #else, spit out the errors
-    else:
-        error = 'That username and/or password is invalid'
-        return render_template('/login.html', error = error)
+    if not successful_login:
+        flash('That username and/or password is invalid')
+        return render_template('/login.html')
 
 @app.route('/register', methods=['GET'])
 def getRegister():
@@ -325,12 +342,16 @@ def postRegister():
 # the @ means decorator function in python
 #decorators basically mean that we access functions in an outer scope of nested functions and are able to alter them
 @app.route('/')
+
 #leanve the trailing slash because flask renders even when not there
 @app.route('/watchlists/')
 
 
 
 def homePage():
+
+    uid = functions.read_secure_cookie('user_id')
+    user = uid and models.UsersModel.getUserById(int(uid))
 
     if models.UsersModel.isLoggedIn(login_session):
         user = models.UsersModel.getUserInfo(models.UsersModel.getUserID(login_session['email']))
@@ -346,6 +367,8 @@ def homePage():
     watchlists = models.WatchlistModel.getAllWatchlists()
     #TODO login session is test code
     return render_template('/index.html', watchlists = watchlists, user = user, login_session = login_session)
+
+
 
 @app.route('/watchlists/new/', methods=['GET', 'POST'])
 def getNewWatchlist():
