@@ -229,6 +229,18 @@ def disconnect():
             del login_session['picture']
             del login_session['user_id']
             del login_session['provider']
+        if login_session['provider'] == 'watchlist':
+            del login_session['username']
+            del login_session['state']
+            del login_session['email']
+            del login_session['provider']
+            #set cookie
+            #we need to set the cookie in here or else it will not set properly
+            response = make_response(redirect('/'))
+            response.set_cookie(
+                'Watchlist-login',
+                '%s=' % 'user_id')
+            return response
         return redirect('/')
     else:
         return redirect('/')
@@ -264,10 +276,10 @@ def showLogin():
 
 @app.route('/login', methods=['POST'])
 def postLogin():
-    username = request.form['username']
+    email = request.form['email']
     password = request.form['password']
 
-    successful_login = models.UsersModel.login(username, password)
+    successful_login = models.UsersModel.login(email, password)
 
     #if we were able to validate the user
     #login the user and direct them to the main page
@@ -286,7 +298,8 @@ def postLogin():
         expire_date = expire_date + datetime.timedelta(days=90)
         response.set_cookie(
             'Watchlist-login',
-            '%s=%s' % ('user_id', cookie_val))
+            '%s=%s' % ('user_id', cookie_val),
+            expires=expire_date)
         return response
 
     #else, spit out the errors
