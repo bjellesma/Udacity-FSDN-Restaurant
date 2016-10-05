@@ -49,6 +49,7 @@ def login_required(function):
     return wrap
 
 @app.route('/gconnect', methods=['POST'])
+
 def gconnect():
     # Validate state token
     if request.args.get('state') != login_session['state']:
@@ -391,13 +392,6 @@ def homePage():
         user = models.UsersModel.getUserInfo(models.UsersModel.getUserID(login_session['email']))
     else:
         user = None
-    '''if 'username' not in login_session:
-        username = "Sign in"
-        provider = ''
-    else:
-        username = login_session['username']
-        provider = login_session['provider']
-        '''
     watchlists = models.WatchlistModel.getAllWatchlists()
     #TODO login session is test code
     return render_template('/index.html', watchlists = watchlists, user = user, login_session = login_session)
@@ -405,6 +399,7 @@ def homePage():
 
 
 @app.route('/watchlists/new/', methods=['GET', 'POST'])
+@login_required
 def getNewWatchlist():
     #if user is logged in
     if models.UsersModel.isLoggedIn(login_session):
@@ -430,14 +425,15 @@ def getWatchlist(watchlist_id):
 
 
 @app.route('/watchlists/<int:watchlist_id>/newMedia/', methods=['GET'])
-
+@login_required
 def newMedia(watchlist_id):
     #if user is logged in
-    if 'username' not in login_session:
-        return redirect ('/login')
+    if models.UsersModel.isLoggedIn(login_session):
+        user = models.UsersModel.getUserInfo(models.UsersModel.getUserID(login_session['email']))
+        user_id = user.id
     else:
-        user_email = login_session['email']
-        user_id = models.UsersModel.getUserID(user_email)
+        user = None
+        user_id = None
     if request.method =='GET':
         #for a get variable, it's a lot easier to tell if it exists
         if request.args.get('id') and request.args.get('title') and request.args.get('art'):
@@ -448,16 +444,17 @@ def newMedia(watchlist_id):
             imdb_id = ''
             imdb_title = ''
             imdb_art = 'http://placehold.it/350x150'
-        flash("%s has been created" % request.form['name'])
-    return render_template('newMedia.html', watchlist_id = watchlist_id, user_id = user_id, imdb_id = imdb_id, imdb_title = imdb_title, imdb_cover = imdb_art)
+        #flash("%s has been created" % request.form['name'])
+    return render_template('newMedia.html', watchlist_id = watchlist_id, user_id = user_id, imdb_id = imdb_id, imdb_title = imdb_title, imdb_cover = imdb_art, user = user)
 
 @app.route('/watchlists/<int:watchlist_id>/newMedia/', methods=['POST'])
+@login_required
 def postNewMedia(watchlist_id):
     if request.method =='POST':
         models.MediaModel.postNewMedia(watchlist_id,
                         request.form['name'],
                         request.form['imdb_id'],
-                        request.form['imdb_art'],
+                        request.form['imdb_cover'],
                         request.form['rating'],
                         request.form['comments'],
                         request.form['type'],
@@ -466,11 +463,20 @@ def postNewMedia(watchlist_id):
     return redirect("/watchlists/%s" % watchlist_id, code=200)
 
 @app.route('/watchlists/<int:watchlist_id>/newMedia/search', methods=['GET'])
+@login_required
+
 def getNewSearchMedia(watchlist_id):
-    return render_template('newSearchMedia.html', watchlist_id = watchlist_id)
+    #if user is logged in
+    if models.UsersModel.isLoggedIn(login_session):
+        user = models.UsersModel.getUserInfo(models.UsersModel.getUserID(login_session['email']))
+    else:
+        user = None
+    return render_template('newSearchMedia.html', watchlist_id = watchlist_id, user = user)
 
 @app.route('/watchlists/<int:watchlist_id>/newMedia/search', methods=['POST'])
+@login_required
 def postNewSearchMedia(watchlist_id):
+
     movieID = models.MediaModel.searchIMDBbyMovie(request.form['title'], int(request.form['searchInt']))
     movieInfo = models.MediaModel.getIMDBbyID(int(movieID))
     return jsonify({
@@ -480,9 +486,17 @@ def postNewSearchMedia(watchlist_id):
         'description': movieInfo['plot summary']
     })
 
+#TODO test code
 @app.route('/media/<int:watchlist_id>/<int:media_id>/edit/', methods=['GET', 'POST'])
-
+@login_required
 def editMedia(media_id, watchlist_id):
+    #if user is logged in
+    if models.UsersModel.isLoggedIn(login_session):
+        user = models.UsersModel.getUserInfo(models.UsersModel.getUserID(login_session['email']))
+        user_id = user.id
+    else:
+        user = None
+        user_id = None
     media = models.MediaModel.getMediaByID(media_id)
     if request.method =='POST':
         models.MediaModel.postEditMedia(watchlist_id,
@@ -492,11 +506,19 @@ def editMedia(media_id, watchlist_id):
                         request.form['comments']
                         )
         flash("%s has been Updated" % media.name)
-    return render_template('editMedia.html', watchlist_id = watchlist_id, media=media)
+    return render_template('editMedia.html', watchlist_id = watchlist_id, media=media, user = user)
 
+#TODO test code
 @app.route('/media/<int:watchlist_id>/<int:media_id>/delete/', methods=['GET', 'POST'])
-
+@login_required
 def deleteMedia(media_id, watchlist_id):
+    #if user is logged in
+    if models.UsersModel.isLoggedIn(login_session):
+        user = models.UsersModel.getUserInfo(models.UsersModel.getUserID(login_session['email']))
+        user_id = user.id
+    else:
+        user = None
+        user_id = None
     media = models.MediaModel.getMediaByID(media_id)
     if request.method =='POST':
         if request.form['response'] =='yes':
@@ -505,7 +527,7 @@ def deleteMedia(media_id, watchlist_id):
 
         flash("%s has been deleted" % media.name)
         return redirect("/watchlists/%s" % watchlist_id, code=200)
-    return render_template('deleteMedia.html', watchlist_id = watchlist_id, media=media)
+    return render_template('deleteMedia.html', watchlist_id = watchlist_id, media=media, user = user)
 if __name__ == "__main__":
     app.secret_key = secure.secret
     #enabling debug mode allows the server to reload itself each time it notices a change in its code
