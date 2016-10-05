@@ -1,11 +1,11 @@
 {% extends "partials/base.html" %}
 {% block title %}Home{% endblock %}
 {% block body %}
-<!-- TODO Test Code -->
+<!-- TODO Test Code
 {% for login in login_session %}
 <p>{{login}}</p>
 {% endfor %}
-<!-- END TEST CODE -->
+END TEST CODE -->
 {% for watchlist in watchlists %}
 <a href="{{ '/watchlists/%s'% watchlist.id }}"><h1>{{watchlist.name}}</h1></a>
 {% endfor %}

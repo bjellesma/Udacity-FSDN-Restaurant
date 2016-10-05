@@ -26,12 +26,27 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Watchlist, Media
 
+#decorator module
+from functools import wraps
+
 app = Flask(__name__)
 
 #open and read JSON file with client secrets
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "Watchlist Application"
+
+#declare decorator function to require login
+def login_required(function):
+    @wraps(function)
+    #args and kwargs is arguments and keyword arguments respectively
+    def wrap(*args, **kwargs):
+        if models.UsersModel.isLoggedIn(login_session):
+            return function(*args, **kwargs)
+        else:
+            flash('Sorry, you must be logged in to access this route')
+            return redirect('/')
+    return wrap
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
@@ -205,6 +220,7 @@ def fbdisconnect():
 
 # Disconnect based on provider
 @app.route('/disconnect')
+@login_required
 def disconnect():
     if 'provider' in login_session:
         if login_session['provider'] == 'google':
@@ -231,7 +247,7 @@ def disconnect():
             del login_session['provider']
         if login_session['provider'] == 'watchlist':
             del login_session['username']
-            del login_session['state']
+            #del login_session['state']
             del login_session['email']
             del login_session['provider']
             #set cookie
@@ -391,17 +407,18 @@ def homePage():
 @app.route('/watchlists/new/', methods=['GET', 'POST'])
 def getNewWatchlist():
     #if user is logged in
-    if 'username' not in login_session:
-        return redirect ('/login')
+    if models.UsersModel.isLoggedIn(login_session):
+        user = models.UsersModel.getUserInfo(models.UsersModel.getUserID(login_session['email']))
+        user_id = user.id
     else:
-        user_email = login_session['email']
-        user_id = models.UsersModel.getUserID(user_email)
+        user = None
+        user_id = None
     if request.method =='POST':
         models.WatchlistModel.postNewWatchlist(request.form['name'],
                         request.form['user_id']
                         )
         flash("%s has been created" % request.form['name'])
-    return render_template('newWatchlist.html', user_id = user_id)
+    return render_template('newWatchlist.html', user_id = user_id, user = user)
 
 @app.route('/watchlists/<int:watchlist_id>/')
 
