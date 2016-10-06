@@ -523,14 +523,18 @@ def deleteMedia(media_id, watchlist_id):
         user = None
         user_id = None
     media = models.MediaModel.getMediaByID(media_id)
-    if request.method =='POST':
-        if request.form['response'] =='yes':
-            models.MediaModel.deleteMedia(media_id)
+    if user_id == media_id:
+        if request.method =='POST':
+            if request.form['response'] =='yes':
+                models.MediaModel.deleteMedia(media_id)
 
 
-        flash("%s has been deleted" % media.name)
-        return redirect("/watchlists/%s" % watchlist_id, code=200)
-    return render_template('deleteMedia.html', watchlist_id = watchlist_id, media=media, user = user)
+            flash("%s has been deleted" % media.name)
+            return redirect("/watchlists/%s" % watchlist_id, code=200)
+        return render_template('deleteMedia.html', watchlist_id = watchlist_id, media=media, user = user)
+    else:
+        return redirect('/')
+    return ''
 if __name__ == "__main__":
     app.secret_key = secure.secret
     #enabling debug mode allows the server to reload itself each time it notices a change in its code
