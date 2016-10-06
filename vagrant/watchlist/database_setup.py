@@ -66,9 +66,10 @@ class Media(Base):
     def serialize(self):
 
         return {
+            'id': self.id,
             'name': self.name,
-            'description': self.description,
             'imdb_id': self.imdb_id,
+            'art': self.art,
             'type': self.type,
             'rating': self.rating,
             'comments': self.comments

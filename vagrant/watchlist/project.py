@@ -273,13 +273,12 @@ session = DBSession()
 #JSON is useful for creating APIs because it parses the pure data in a low bandwidth format
 @app.route('/watchlist/<int:watchlist_id>/JSON')
 def watchlistJSON(watchlist_id):
-    watchlist = models.WatchlistModel.getWatchlistByID(watchlist_id)
-    media = models.MediaModel.getAllMedia(watchlist_id)
+    items = models.MediaModel.getAllMediaItems(watchlist_id)
     return jsonify(Media=[i.serialize for i in items])
 
 @app.route('/watchlists/<int:watchlist_id>/media/<int:media_id>/JSON')
 def mediaJSON(watchlist_id, media_id):
-    media = models.MediaModel.getMediaByID(media_id)
+    item = models.MediaModel.getMediaByID(media_id)
     return jsonify(Media=[item.serialize])
 
 @app.route('/login', methods=['GET'])

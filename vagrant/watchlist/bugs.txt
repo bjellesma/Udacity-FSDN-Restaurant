@@ -1,0 +1,1 @@
+Redirect isn't working after posting new Media 
