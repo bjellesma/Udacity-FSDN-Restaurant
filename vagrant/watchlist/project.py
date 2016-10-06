@@ -523,7 +523,7 @@ def deleteMedia(media_id, watchlist_id):
         user = None
         user_id = None
     media = models.MediaModel.getMediaByID(media_id)
-    if user_id == media_id:
+    if user_id == media.user_id:
         if request.method =='POST':
             if request.form['response'] =='yes':
                 models.MediaModel.deleteMedia(media_id)
