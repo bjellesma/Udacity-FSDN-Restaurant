@@ -14,7 +14,10 @@
   </div>
 </div>
 
+{% if user.id == item.user_id %}
 <a href="{{'/media/%s/%s/delete/' % (watchlist.id, item.id)}}"><button type='button'>Delete</button></a>
+<a href="{{'/media/%s/%s/edit/' % (watchlist.id, item.id)}}"><button type='button'>Edit</button></a>
 <br>
+{% endif %}
 {% endfor %}
 {% endblock %}

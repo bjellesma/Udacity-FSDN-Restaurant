@@ -417,10 +417,14 @@ def getNewWatchlist():
 @app.route('/watchlists/<int:watchlist_id>/')
 
 def getWatchlist(watchlist_id):
+    #if user is logged in
+    if models.UsersModel.isLoggedIn(login_session):
+        user = models.UsersModel.getUserInfo(models.UsersModel.getUserID(login_session['email']))
+        user_id = user.id
     #get watchlist
     watchlist = models.WatchlistModel.getWatchlistByID(watchlist_id)
     media = models.MediaModel.getAllMediaItems(watchlist_id)
-    return render_template('watchlist.html', watchlist = watchlist, items = media)
+    return render_template('watchlist.html', watchlist = watchlist, items = media, user = user)
 
 
 @app.route('/watchlists/<int:watchlist_id>/newMedia/', methods=['GET'])

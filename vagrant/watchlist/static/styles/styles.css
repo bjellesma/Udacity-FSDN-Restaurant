@@ -1,3 +1,7 @@
+body {
+  background-color: #131313;
+  color: #fff;
+}
 .message_flash {
   color: green;
 }
@@ -64,5 +68,5 @@ form#watchlist_login_form{
 
 }
 #watchlist_register_form{
-  
+
 }
