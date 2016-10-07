@@ -395,6 +395,16 @@ def homePage():
     #TODO login session is test code
     return render_template('/index.html', watchlists = watchlists, user = user, login_session = login_session)
 
+@app.route('/profile', methods=['GET'])
+@login_required
+def getProfile():
+    if request.args.get('user'):
+        userID = request.args.get('user')
+        user = models.UsersModel.getUserById(userID)
+        return render_template('profile.html', user = user)
+    #The following statement is only reached if the user reaches the page by mistake
+    return redirect('/')
+
 
 
 @app.route('/watchlists/new/', methods=['GET', 'POST'])

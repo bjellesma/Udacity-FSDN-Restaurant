@@ -1,0 +1,18 @@
+{% extends "partials/base.html" %}
+{% block title %}{{user.username}}{% endblock %}
+{% block body %}
+<div id="profile-header">
+  {% if user.picture == None %}
+  <a href="#">Please enter a profile picture</a>
+  {% else %}
+  <img src="{{user.picture}}" alt="profile picture">
+  {% endif %}
+<h2>
+  {% if user.firstName == None and user.lastName == None %}
+  <a href="#">Please enter your name</a>
+  {% else %}
+  {{user.firstName}} {{user.lastName}}
+  {% endif %}
+</h2>
+</div>
+{% endblock %}

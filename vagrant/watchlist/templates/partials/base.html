@@ -35,7 +35,7 @@
         <ul>
           <li><a href="/">Home</a></li>
           {% if user %}
-            <li><a href="#">{{ user.username }}</a></li>
+            <li><a href="/profile?user={{user.id}}">{{ user.username }}</a></li>
             <li><a href="/disconnect">Logout</a></li>
           {% else %}
             <li><a href="/login">Login</a></li>

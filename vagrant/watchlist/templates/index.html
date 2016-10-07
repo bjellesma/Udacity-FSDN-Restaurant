@@ -7,7 +7,8 @@
 {% endfor %}
 END TEST CODE -->
 {% for watchlist in watchlists %}
-<a href="{{ '/watchlists/%s'% watchlist.id }}"><h1>{{watchlist.name}}</h1></a>
+<h2>Community contributed watchlists:<h2>
+<a href="{{ '/watchlists/%s'% watchlist.id }}">{{watchlist.name}}</a> submitted by <a href="#">{{watchlist.user_id}}</a><br>
 {% endfor %}
 <!--TODO if logged in-->
 <a href="{{ '/watchlists/new'}}"><button type="button">New Watchlist!</button></a><br>

@@ -21,6 +21,9 @@ class Users(Base):
     id = Column(Integer, primary_key = True)
     provider = Column(String(80), nullable = False)
     username = Column(String(80), nullable = False)
+    firstName = Column(String(80))
+    lastName = Column(String(80))
+    motto = Column(String(80))
     email = Column(String(80), nullable = False)
     picture = Column(String(80))
 
